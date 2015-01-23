@@ -2,70 +2,18 @@
 
 package io.yeet.cordova.android.startup;
 
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaArgs;
-import org.apache.cordova.CordovaInterface;
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.CordovaWebView;
-import org.json.JSONException;
-
+import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
-import android.view.WindowManager;
+import android.content.Intent;
 
-public class ChromePower extends CordovaPlugin {
-    private WakeLock systemLock = null;
+public class BootUpReceiver extends BroadcastReceiver {
 
-    @Override
-    public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
-        if ("requestKeepAwake".equals(action)) {
-            requestKeepAwake(args);
-            return true;
-        } else if ("releaseKeepAwake".equals(action)) {
-            releaseKeepAwake();
-            return true;
+        @Override
+        public void onReceive(Context context, Intent intent) {
+                Intent i = new Intent(context);  
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(i);  
         }
 
-        return false;
-    }
-
-    @Override
-    public void onReset() {
-        releaseKeepAwake();
-    }
-
-    @Override
-    public void onDestroy() {
-        releaseKeepAwake();
-    }
-
-    private void requestKeepAwake(final CordovaArgs args) {
-        final String level = args.optString(0);
-        cordova.getActivity().runOnUiThread(new Runnable() {
-            public void run() {
-                if ("display".equals(level)) {
-                    cordova.getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                } else if ("system".equals(level)) {
-                    if (systemLock == null) {
-                        PowerManager powerManager = (PowerManager) cordova.getActivity().getSystemService(Context.POWER_SERVICE);
-                        systemLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Chrome Power System lock");
-                        systemLock.acquire();
-                    }
-                }
-            }
-        });
-    }
-
-    private void releaseKeepAwake() {
-        cordova.getActivity().runOnUiThread(new Runnable() {
-            public void run() {
-                cordova.getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                if (systemLock != null) {
-                    systemLock.release();
-                    systemLock = null;
-                }
-            }
-        });
-    }
 }
