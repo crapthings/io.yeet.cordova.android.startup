@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- tba -->
+<plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
+    id="io.yeet.cordova.android.startup"
+    version="1.0.4-dev">
+  <engines>
+    <engine name="cordova" version=">=3.0.0" />
+  </engines>
+
+  <name>Android Auto Startup</name>
+  <keywords>android,startup,boot,autorun</keywords>
+  <repo>https://github.com/crapthings/io.yeet.cordova.android.startup.git</repo>
+  <issue>https://github.com/crapthings/io.yeet.cordova.android.startup/issues</issue>
+
+  <js-module src="startup.js" name="startup">
+    <clobbers target="startup" />
+  </js-module>
+
+  <platform name="android">
+    <source-file src="src/android/startup.java" target-dir="src/io/yeet" />
+
+    <config-file target="res/xml/config.xml" parent="/widget">
+      <feature name="startup">
+        <param name="android-package" value="io.yeet.cordova.android.startup"/>
+      </feature>
+    </config-file>
+    <config-file target="AndroidManifest.xml" parent="/manifest">
+      <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    </config-file>
+    <config-file target="AndroidManifest.xml" parent="/manifest/application">
+      <receiver android:enabled="true" android:name=".BootUpReceiver" android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+        <intent-filter>
+          <action android:name="android.intent.action.BOOT_COMPLETED" />
+          <category android:name="android.intent.category.DEFAULT" />
+          </intent-filter>
+      </receiver>
+    </config-file>
+  </platform>
+
+</plugin>
